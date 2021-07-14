@@ -145,4 +145,25 @@ after_initialize do
   add_to_serializer(:topic_view, :include_landing_page_url?) do
     object.topic.landing_page_url.present?
   end
+  
+  LANDING_HOME ||= "/welcome"
+  
+  add_model_callback(:application_controller, :before_action) do   
+    if !current_user &&
+        !Discourse.cache.read(landing_page_cache_key(request.remote_ip)) &&
+        destination_url == "#{Discourse.base_url}/"
+      
+      Discourse.cache.write landing_page_cache_key(request.remote_ip), true, expires_in: 5.minutes
+      redirect_to LANDING_HOME
+      return
+    else
+      #
+    end
+  end
+  
+  GUEST_REDIRECT_CACHE_KEY ||= "landing_pages_has_redirected"
+  
+  add_to_class(:application_controller, :landing_page_cache_key) do |ip_address|
+    "#{GUEST_REDIRECT_CACHE_KEY}_#{ip_address.gsub(/\./, '_')}"
+  end
 end
