@@ -24,7 +24,7 @@ class LandingPages::LandingController < ::ActionController::Base
 
   def show
     if @page.present?
-      @page_title = SiteSetting.title + " | #{@page.name}"
+      @page_title = "#{@page.name} | #{SiteSetting.title}"
       @classes = @page.name.parameterize
 
       if @global.present?
